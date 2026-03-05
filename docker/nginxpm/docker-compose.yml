@@ -10,7 +10,7 @@ networks:
 
 services:
   nginxpm:
-    image: jc21/nginx-proxy-manager:2.11.3
+    image: jc21/nginx-proxy-manager:2.13.2
     container_name: nginxpm
     hostname: nginxpm
     restart: unless-stopped
