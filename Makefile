@@ -23,6 +23,6 @@ nginxpm:
 	docker volume create nginxpm_letsencrypt
 	$(call docker_rebuild, "nginxpm","docker/nginxpm")
 
-# IT-Tools
+# it-tools
 it-tools:
 	$(call docker_rebuild, "it-tools","docker/it-tools")
