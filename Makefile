@@ -26,3 +26,9 @@ nginxpm:
 # it-tools
 it-tools:
 	$(call docker_rebuild, "it-tools","docker/it-tools")
+
+# Jellyfin
+jellyfin:
+	docker volume create jellyfin_config
+	docker volume create jellyfin_cache
+	$(call docker_rebuild, "jellyfin","docker/jellyfin")

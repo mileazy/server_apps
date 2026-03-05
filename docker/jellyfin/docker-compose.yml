@@ -1,0 +1,32 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+
+    ports:
+      - "8096:8096"
+
+    environment:
+      - TZ=Europe/Rome
+
+    volumes:
+      - jellyfin_config:/config
+      - jellyfin_cache:/cache
+      - /srv/dev-disk-by-uuid-C0BCCBCEBCCBBD62/MULTIMEDIA:/media
+
+    devices:
+      - /dev/dri:/dev/dri
+
+    networks:
+      - reverse-proxy
+
+volumes:
+  jellyfin_config:
+    external: true
+  jellyfin_cache:
+    external: true
+
+networks:
+  reverse-proxy:
+    external: true
