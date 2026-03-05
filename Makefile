@@ -16,8 +16,13 @@ init:
 portainer:
 	docker volume create portainer_data
 	$(call docker_rebuild, "portainer","docker/portainer")
+
 # Nginx Proxy Manager
 nginxpm:
 	docker volume create nginxpm_data
 	docker volume create nginxpm_letsencrypt
 	$(call docker_rebuild, "nginxpm","docker/nginxpm")
+
+# IT-Tools
+it-tools:
+	$(call docker_rebuild, "it-tools","docker/it-tools")
