@@ -10,7 +10,6 @@ define docker_rebuild
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml build --no-cache && \
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml up -d
 endef
-
 # Function: Docker Remove
 # [Exectute: down, rm]
 # $(call docker_remove, "stack_name")
