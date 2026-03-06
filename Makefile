@@ -1,5 +1,3 @@
-# Makefile for managing Docker containers
-
 # Function: Docker Rebuild
 # [execute: down, remove, pull, build, up]
 # $(call docker_rebuild,"stack_name")
@@ -17,27 +15,22 @@ define docker_remove
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down && \
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f
 endef
-
-# Initialize Docker network
+# Initialization
 init:
 	docker network create --driver bridge reverse-proxy
-
-# Remove stack
+# Remove Stack
 remove:
-	@if [ -z "$(stack)" ]; then echo "Error: Please specify a stack to remove. Usage: make remove stack=stack_name"; exit 1; fi
-	$(call docker_remove, $(stack))
-
+	@if [ -z "$(stack)" ]; then echo "usage: make remove stack=portainer"; exit 1; fi
+	$(call docker_remove,$(stack))
 # Portainer
 portainer:
 	docker volume create portainer_data
-	$(call docker_rebuild, "portainer")
-
-# Nginx Proxy Manager
+	$(call docker_rebuild,"portainer")
+# NGINX Proxy Manager
 nginxpm:
 	docker volume create nginxpm_data
 	docker volume create nginxpm_letsencrypt
-	$(call docker_rebuild, "nginxpm")
-
+	$(call docker_rebuild,"nginxpm")
 # it-tools
 it-tools:
 	$(call docker_rebuild, "it-tools")
