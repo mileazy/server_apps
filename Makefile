@@ -16,7 +16,7 @@ endef
 # $(call docker_remove, "stack_name")
 define docker_remove
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down && \
-	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f && \
+	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f
 endef
 
 # Initialize Docker network
