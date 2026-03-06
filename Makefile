@@ -8,10 +8,17 @@ define docker_rebuild
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml build --no-cache && \
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml up -d
 endef
-# Function: Docker Remove
-# [execute: down, remove]
+# Function: Docker Remove (images only)
+# [execute: down, remove, delete images]
 # $(call docker_remove,"stack_name")
 define docker_remove
+	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down --rmi all && \
+	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f
+endef
+# Function: Docker Remove (images and volumes)
+# [execute: down, remove, delete images and volumes]
+# $(call docker_remove_full,"stack_name")
+define docker_remove_full
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down --rmi all --volumes && \
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f
 endef
@@ -21,7 +28,7 @@ init:
 # Remove Stack
 remove:
 	@if [ -z "$(stack)" ]; then echo "usage: make remove stack=portainer"; exit 1; fi
-	$(call docker_remove,$(stack))
+	@powershell -NoProfile -Command "$$choice = Read-Host 'Rimuovere anche i volumi? (s/n)'; if ($$choice -eq 's' -or $$choice -eq 'S') { exit 0 } else { exit 1 }" && $(call docker_remove_full,$(stack)) || $(call docker_remove,$(stack))
 # Portainer
 portainer:
 	docker volume create portainer_data
