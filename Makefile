@@ -28,7 +28,7 @@ init:
 # Remove Stack
 remove:
 	@if [ -z "$(stack)" ]; then echo "usage: make remove stack=portainer"; exit 1; fi
-	@powershell -NoProfile -Command "$$choice = Read-Host 'Rimuovere anche i volumi? (s/n)'; if ($$choice -eq 's' -or $$choice -eq 'S') { exit 0 } else { exit 1 }" && $(call docker_remove_full,$(stack)) || $(call docker_remove,$(stack))
+	@read -p "Rimuovere anche i volumi? (s/n): " choice; if [ "$$choice" = "s" ] || [ "$$choice" = "S" ]; then $(call docker_remove_full,$(stack)); else $(call docker_remove,$(stack)); fi
 # Portainer
 portainer:
 	docker volume create portainer_data
