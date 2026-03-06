@@ -33,10 +33,10 @@ nginxpm:
 	$(call docker_rebuild,"nginxpm")
 # it-tools
 it-tools:
-	$(call docker_rebuild, "it-tools")
+	$(call docker_rebuild,"it-tools")
 
 # Jellyfin
 jellyfin:
 	docker volume create jellyfin_config
 	docker volume create jellyfin_cache
-	$(call docker_rebuild, "jellyfin")
+	$(call docker_rebuild,"jellyfin")
