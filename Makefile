@@ -25,9 +25,11 @@ init:
 
 # Remove stack
 remove:
-	@if[-z "$(stack)" ]; then \
-		echo "usage: make remove stack=portainer"; exit 1; fi
-		$(call docker_remove, $(stack))
+	@if [ -z "$(stack)" ]; then \
+		echo "Error: Please specify a stack to remove. Usage: make remove stack=stack_name"; \
+		exit 1; \
+	fi
+	$(call docker_remove, $(stack))
 
 # Portainer
 portainer:
