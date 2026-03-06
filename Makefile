@@ -1,8 +1,8 @@
 # Makefile for managing Docker containers
 
 # Function: Docker Rebuild
-# [Exectute: down, rm, pull, build, up]
-# $(call docker_rebuild, "stack_name")
+# [execute: down, remove, pull, build, up]
+# $(call docker_rebuild,"stack_name")
 define docker_rebuild
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down && \
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f && \
@@ -11,8 +11,8 @@ define docker_rebuild
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml up -d
 endef
 # Function: Docker Remove
-# [Exectute: down, rm]
-# $(call docker_remove, "stack_name")
+# [execute: down, remove]
+# $(call docker_remove,"stack_name")
 define docker_remove
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down && \
 	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f
@@ -24,10 +24,7 @@ init:
 
 # Remove stack
 remove:
-	@if [ -z "$(stack)" ]; then \
-		echo "Error: Please specify a stack to remove. Usage: make remove stack=stack_name"; \
-		exit 1; \
-	fi
+	@if [ -z "$(stack)" ]; then echo "Error: Please specify a stack to remove. Usage: make remove stack=stack_name"; exit 1; fi
 	$(call docker_remove, $(stack))
 
 # Portainer
