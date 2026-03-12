@@ -39,11 +39,13 @@ remove:
 	@if [ -z "$(stack)" ]; then echo "usage: make remove stack=portainer"; exit 1; fi
 	@read -p "Rimuovere anche i volumi? (s/n): " choice; \
 	if [ "$$choice" = "s" ] || [ "$$choice" = "S" ]; then \
+		# first stop and remove containers/images
+		$(call docker_remove,$(stack)); \
+		# then remove associated volumes
 		vols="$(call volumes_for,$(stack))"; \
 		if [ -n "$$vols" ]; then \
 			docker volume rm $$vols || true; \
 		fi; \
-		$(call docker_remove,$(stack)); \
 	else \
 		$(call docker_remove,$(stack)); \
 	fi
