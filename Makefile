@@ -18,9 +18,16 @@ endef
 # Function: Docker Remove (images and volumes)
 # [execute: down, remove, delete images and volumes]
 # $(call docker_remove_full,"stack_name")
+# NOTE: `docker compose down --volumes` only deletes the volumes
+# declared in the compose file.  to remove arbitrary volumes the
+# correct command is `docker volume rm <volume_name>` so we invoke it
+# after bringing the stack down.
 define docker_remove_full
-	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down --rmi all --volumes && \
-	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f
+	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down --rmi all && \
+	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f && \
+	# remove any volumes whose name begins with the stack name
+	# (adjust the filter pattern as needed for custom naming)
+	docker volume rm $$(docker volume ls -q --filter "name=$(1)") || true
 endef
 # Initialization
 init:
@@ -28,7 +35,12 @@ init:
 # Remove Stack
 remove:
 	@if [ -z "$(stack)" ]; then echo "usage: make remove stack=portainer"; exit 1; fi
-	@read -p "Rimuovere anche i volumi? (s/n): " choice; if [ "$$choice" = "s" ] || [ "$$choice" = "S" ]; then $(call docker_remove_full,$(stack)); else $(call docker_remove,$(stack)); fi
+	@read -p "Rimuovere anche i volumi? (s/n): " choice; \
+	if [ "$$choice" = "s" ] || [ "$$choice" = "S" ]; then \
+		$(call docker_remove_full,$(stack)); \
+	else \
+		$(call docker_remove,$(stack)); \
+	fi
 # Portainer
 portainer:
 	docker volume create portainer_data
