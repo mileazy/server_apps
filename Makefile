@@ -18,44 +18,50 @@ endef
 # Function: Docker Remove (images and volumes)
 # [execute: down, remove, delete images and volumes]
 # $(call docker_remove_full,"stack_name")
-# NOTE: `docker compose down --volumes` only deletes the volumes
-# declared in the compose file.  to remove arbitrary volumes the
-# correct command is `docker volume rm <volume_name>` so we invoke it
-# after bringing the stack down.
 define docker_remove_full
-	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down --rmi all && \
-	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f && \
-	# remove any volumes whose name begins with the stack name
-	# (adjust the filter pattern as needed for custom naming)
-	docker volume rm $$(docker volume ls -q --filter "name=$(1)") || true
+	docker compose -p $(1) -f docker/$(1)/docker-compose.yml down --rmi all --volumes && \
+	docker compose -p $(1) -f docker/$(1)/docker-compose.yml rm -f
 endef
 # Initialization
 init:
 	docker network create --driver bridge reverse-proxy
+
+# volume lists for each stack (used by remove target)
+portainer_volumes := portainer_data
+nginxpm_volumes := nginxpm_data nginxpm_letsencrypt
+jellyfin_volumes := jellyfin_config jellyfin_cache
+
+# helper to get volumes variable for a stack
+volumes_for = $($(1)_volumes)
+
 # Remove Stack
 remove:
 	@if [ -z "$(stack)" ]; then echo "usage: make remove stack=portainer"; exit 1; fi
 	@read -p "Rimuovere anche i volumi? (s/n): " choice; \
 	if [ "$$choice" = "s" ] || [ "$$choice" = "S" ]; then \
-		$(call docker_remove_full,$(stack)); \
+		vols="$(call volumes_for,$(stack))"; \
+		if [ -n "$$vols" ]; then \
+			docker volume rm $$vols || true; \
+		fi; \
+		$(call docker_remove,$(stack)); \
 	else \
 		$(call docker_remove,$(stack)); \
 	fi
 # Portainer
 portainer:
-	docker volume create portainer_data
+	docker volume create $(portainer_volumes)
 	$(call docker_rebuild,"portainer")
+
 # NGINX Proxy Manager
 nginxpm:
-	docker volume create nginxpm_data
-	docker volume create nginxpm_letsencrypt
+	docker volume create $(nginxpm_volumes)
 	$(call docker_rebuild,"nginxpm")
+
 # it-tools
 it-tools:
 	$(call docker_rebuild,"it-tools")
 
 # Jellyfin
 jellyfin:
-	docker volume create jellyfin_config
-	docker volume create jellyfin_cache
+	docker volume create $(jellyfin_volumes)
 	$(call docker_rebuild,"jellyfin")
